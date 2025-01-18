@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using Application.Settings;
 using Domain.Entities;
 using Domain.Exceptions;
 

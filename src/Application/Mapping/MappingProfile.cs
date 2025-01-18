@@ -14,6 +14,7 @@ namespace Application.Mapping
         public MappingProfile()
         {
             CreateMap <Applicant, ApplicantDto>();
+            CreateMap<ApplicantDto, Applicant>();
         }
     }
 }

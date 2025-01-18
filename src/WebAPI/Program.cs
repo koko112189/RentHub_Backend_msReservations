@@ -11,7 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configurar EF Core con SQL Server
 builder.Services.AddDbContext<ApplicantsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    b => b.MigrationsAssembly("ApplicantsAPI")));
 
 
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
