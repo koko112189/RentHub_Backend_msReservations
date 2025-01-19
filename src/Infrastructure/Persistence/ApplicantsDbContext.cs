@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence
 {
-    public class ApplicantsDbContext : DbContext
+    public class ApplicantsDbContext : IdentityDbContext<User>
     {
         public ApplicantsDbContext(DbContextOptions<ApplicantsDbContext> options)
             : base(options) { }
