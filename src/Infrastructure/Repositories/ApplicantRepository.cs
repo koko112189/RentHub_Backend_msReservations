@@ -61,5 +61,12 @@ namespace Infrastructure.Repositories
                 _context.Entry(existingApplicant).CurrentValues.SetValues(applicant);
             }
         }
+
+        async public Task<Applicant?> GetByDocumentAsync(string document)
+        {
+            var applicant = await _context.Applicants.FirstOrDefaultAsync(r => r.Document == document);
+
+            return applicant;
+        }
     }
 }

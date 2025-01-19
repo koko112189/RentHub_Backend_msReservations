@@ -42,7 +42,10 @@ namespace Application.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-      
+        public async Task<Applicant?> GetApplicantByDocumentAsync(string document)
+        {
+            return await _unitOfWork.ApplicantRepository.GetByDocumentAsync(document);
+        }
 
         public async Task<Applicant?> GetApplicantByIdAsync(Guid id)
         {

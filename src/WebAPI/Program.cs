@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ApplicantsDbContext>(options =>
 
 
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
+builder.Services.AddScoped<ICsvProcessingService, CsvProcessingService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
 

@@ -18,11 +18,13 @@ namespace WebAPI.Controllers
     {
         private readonly IApplicantService _applicantServiceService;
         private readonly IMapper _mapper;
+        private readonly ICsvProcessingService _csvProcessingService;
 
-        public ApplicantsController(IApplicantService applicantService, IMapper mapper)
+        public ApplicantsController(IApplicantService applicantService, IMapper mapper, ICsvProcessingService csvProcessingService)
         {
             _applicantServiceService = applicantService;
             _mapper = mapper;
+            _csvProcessingService = csvProcessingService;
         }
 
         [HttpPost]
@@ -62,7 +64,6 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var applicants = await _applicantServiceService.GetApplicantsAsync();
-            //var applicantDto = _mapper.Map<IEnumerable<ApplicantDto>>(applicants);
             return Ok(applicants);
         }
 
@@ -83,37 +84,40 @@ namespace WebAPI.Controllers
 
             try
             {
-                using (var reader = new StreamReader(file.OpenReadStream()))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                var (successfulRecords, failedRecords) = await _csvProcessingService.ProcessCsvAsync(file);
+
+                if (failedRecords.Any())
                 {
-                    var records = csv.GetRecords<ApplicantDto>().ToList();
-
-                    if (records == null || !records.Any())
+                    return Ok(new
                     {
-                        return BadRequest("El archivo CSV no contiene datos válidos.");
-                    }
-
-                    foreach (var applicantDto in records)
+                        Message = "Algunos registros no se pudieron guardar.",
+                        SuccessfulCount = successfulRecords.Count,
+                        FailedCount = failedRecords.Count,
+                        SuccessfulRecords = successfulRecords,
+                        FailedRecords = failedRecords.Select(f => new
+                        {
+                            Record = f.Record,
+                            Error = f.Error
+                        }).ToList()
+                    });
+                }
+                else
+                {
+                    return Ok(new
                     {
-                        var applicant = _mapper.Map<Applicant>(applicantDto);
-                        await _applicantServiceService.CreateApplicantAsync(applicant);
-                    }
-
-                    return Ok($"Se han cargado {records.Count} registros correctamente.");
+                        Message = "Todos los registros se guardaron correctamente.",
+                        SuccessfulCount = successfulRecords.Count,
+                        SuccessfulRecords = successfulRecords
+                    });
                 }
             }
-            catch (DbUpdateException ex)
+            catch (ArgumentException ex)
             {
-                if (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2627 || sqlEx.Number == 2601))
-                {
-                    return StatusCode(409, "El documento ya existe.");
-                }
-
-                return StatusCode(500, "Ocurrió un error inesperado al guardar el aplicante.");
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Ocurrió un error inesperado.");
+                return StatusCode(500, $"Ocurrió un error inesperado: {ex.Message}");
             }
         }
     }

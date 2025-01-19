@@ -12,6 +12,7 @@ namespace Application.Interfaces
         Task CreateApplicantAsync(Applicant applicant);
         Task<IEnumerable<Applicant>> GetApplicantsAsync();
         Task<Applicant?> GetApplicantByIdAsync(Guid id);
+        Task<Applicant?> GetApplicantByDocumentAsync(string document);
         Task UpdateApplicantAsync(Applicant applicant);
         Task DeleteApplicantAsync(Guid id);
     }

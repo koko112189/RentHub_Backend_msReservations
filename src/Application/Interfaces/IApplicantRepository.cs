@@ -10,6 +10,7 @@ namespace Application.Interfaces
     public interface IApplicantRepository
     {
         Task<Applicant> GetByIdAsync(Guid id);
+        Task<Applicant?> GetByDocumentAsync(string document);
         Task<IEnumerable<Applicant>> GetAllAsync();
         Task AddAsync(Applicant reservation);
         Task UpdateAsync(Applicant reservation);
